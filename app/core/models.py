@@ -1,6 +1,16 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
+class AdditionalUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    timezone = models.TextField(blank=True, null=True)
+    coach = models.ManyToManyField('self',
+                                   related_name='students',
+                                   symmetrical=False,
+                                   blank=True)
+
+
 # Create your models here.
 class UpcomingCall(models.Model):
     """Upcoming Calls Model"""
