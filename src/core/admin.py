@@ -5,7 +5,7 @@ from .models import AdditionalUser, UpcomingCall
 
 @admin.register(AdditionalUser)
 class AdditionalUserAdmin(admin.ModelAdmin):
-    list_display = ('timezone', )
+    list_display = ('time_zone', )
     list_filter = ('user',)
 
 @admin.register(UpcomingCall)

@@ -4,7 +4,7 @@ from django.db import models
 
 class AdditionalUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    timezone = models.TextField(blank=True, null=True)
+    time_zone = models.TextField(blank=True, null=True)
     coach = models.ManyToManyField('self',
                                    related_name='students',
                                    symmetrical=False,
