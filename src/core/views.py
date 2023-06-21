@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from rest_framework import viewsets
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from pytz import timezone
@@ -21,7 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -30,7 +30,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class UpcomingCallsViewSet(viewsets.ModelViewSet):
@@ -69,9 +69,9 @@ class UpcomingCallsViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """Assign permissions based on action."""
         if self.action in ['user_upcoming_calls']:
-            permissions = [permissions.IsAuthenticated]
+            permissions = [IsAuthenticated]
         else:
-            permissions = [permissions.IsAuthenticated,
+            permissions = [IsAuthenticated,
                            SuperUserOnlyPermission]
         return [p() for p in permissions]
 
