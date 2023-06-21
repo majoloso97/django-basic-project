@@ -1,4 +1,5 @@
-from datetime import datetime, time, timedelta
+import time
+from datetime import datetime, timedelta
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -45,10 +46,11 @@ class UpcomingCallsViewSet(viewsets.ModelViewSet):
         coach_time_zone = coach.time_zone if coach.time_zone else default_time_zone
         dt = timezone(coach_time_zone).localize(timestamp_dt)
 
-        for participant in participants:
+        for _participant in participants:
             timestamp_dt = datetime.fromtimestamp(
                 upcoming_call.timestamp/1000.0)
-
+            
+            participant = AdditionalUser.objects.get(id=_participant.id)
             tz = timezone(
                 participant.time_zone if participant.time_zone else default_time_zone)
             aware_timestamp_dt = dt.astimezone(tz=tz)
@@ -81,15 +83,16 @@ class UpcomingCallsViewSet(viewsets.ModelViewSet):
             .filter(user=current_user).order_by('-timestamp')
 
     def perform_create(self, serializer):
-        current_user = self.request.user
-        upcoming_call = serializer.save(user=current_user)
+        request_user = self.request.user
+        upcoming_call = serializer.save(user=request_user)
+        current_user = AdditionalUser.objects.get(id=request_user.id)
         tz = self.request.data['time_zone']
         if current_user.time_zone != tz:
             user_profile = UpdateUserFieldsSerializer(current_user).data
             user_profile['time_zone'] = tz
             user_serializer = UpdateUserFieldsSerializer()
             user_serializer.update(current_user, user_profile)
-        user = get_object_or_404(User, pk=current_user.id)
+        user = get_object_or_404(AdditionalUser, pk=current_user.id)
         self._notify_upcoming_call_participants(
             user, set(serializer.instance.participants.all()), serializer.instance)
 
